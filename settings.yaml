@@ -10,4 +10,4 @@ settings:
   wg:
     characters: "01"
     min_length: 2
-    max_length: 30 
+    max_length: 3 
