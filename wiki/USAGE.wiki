@@ -1,0 +1,12 @@
+= Usage =
+
+Create/change a configuration file settings.yaml 
+
+Now in one console run
+
+ * ruby wg.rb settings.yaml init
+ * ruby wg.rb settings.yaml dump_results
+
+Now in 1 or more consoles (and maybe on different computers) run
+
+ * ruby wg.rb settings.yaml run
