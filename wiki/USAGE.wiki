@@ -1,5 +1,7 @@
 = Usage =
 
+Start the JMS server, for instance /opt/apacge-activemq/bin/activemq
+ 
 Create/change a configuration file settings.yaml 
 
 In a console run
