@@ -8,6 +8,8 @@ settings:
     candidate_words_queue: /queue/wg.candidate.words
     processed_words_queue: /queue/wg.processed.words
   wg:
-    characters: "01"
+    characters: "ab"
     min_length: 2
-    max_length: 3 
+    max_length: 3
+    max_char_occurs: ab:2
+    min_char_occurs: b:1,a:1

@@ -26,18 +26,40 @@ require 'rubygems'
 require 'stomp'
 require 'logger'
 require 'yaml'
-
+require "socket"
 
 class WG
   def initialize( configfile )
     @logger = Logger.new(STDOUT)
-    @logger.level = Logger::WARN
+    @logger.level = Logger::DEBUG
 
     @CONFIG = YAML::load(File.read(configfile)) 
       
     @characters = @CONFIG['settings']['wg']['characters'].split('')
     @min_length = @CONFIG['settings']['wg']['min_length'].to_i
     @max_length = @CONFIG['settings']['wg']['max_length'].to_i
+    
+    @min_char_occurs = Hash.new
+    for s in @CONFIG['settings']['wg']['min_char_occurs'].split(',')
+      entry = s.split(':')
+      value = entry[1].to_i
+      for char in entry[0].split('')
+        @min_char_occurs[char] = value
+      end
+    end
+    
+    @logger.debug("min_char_occurs: #{@min_char_occurs}")
+    
+    @max_char_occurs = Hash.new
+    for s in @CONFIG['settings']['wg']['max_char_occurs'].split(',')
+      entry = s.split(':')
+      value = entry[1].to_i
+      for char in entry[0].split('')
+        @max_char_occurs[char] = value
+      end
+    end
+    
+    @logger.debug("max_char_occurs: #{@max_char_occurs}")
     
     # JMS settings
     @jms_hostname = @CONFIG['settings']['jms']['hostname']
@@ -60,7 +82,7 @@ class WG
     jms_connection.subscribe(@jms_results_queue)
     
     # receive a string
-    @logger.info "DUMP Results:"
+    @logger.info("DUMP Results:")
     while true
       result = jms_connection.receive.body
       STDOUT.puts result.to_s
@@ -75,7 +97,7 @@ class WG
     jms_connection.subscribe(@jms_processed_words_queue)
     
     # receive a string
-    @logger.info "DUMP processed:"
+    @logger.info("DUMP processed:")
     while true
       result = jms_connection.receive.body
       STDOUT.puts result
@@ -85,15 +107,43 @@ class WG
     
   end
   
-  def valid_word?( string)
+  def valid_min_length?(string)
     l = string.length
-    return false if l < @min_length or l > @max_length
-      
+    if l < @min_length
+      @logger.debug("'#{string}' is too small.")
+      return false 
+    end
     return true
+  end
+ 
+  def valid_min_char_occurs?(string)
+    @min_char_occurs.each do |key, value| 
+      if string.count(key) < value
+        @logger.debug("'#{string}' has too few occurrences (#{value}) of '#{key}'")
+        return false        
+      end
+    end
+    return true
+  end
+  
+  def valid_max_char_occurs?(string)
+    @max_char_occurs.each do |key, value| 
+      if string.count(key) > value
+        @logger.debug("'#{string}' has too much occurrences (#{value}) of '#{key}'")
+        return false        
+      end
+    end
+    return true
+  end
+  
+  def valid_word?( string)
+    valid_min_length?(string) and valid_min_char_occurs?(string)
   end
   
   def run
     jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
+    hostname = Socket.gethostname
+    pid = Process.pid
 
     # gest strings of size length-1 from JMS
     jms_connection.subscribe( @jms_candidate_words_queue )
@@ -103,17 +153,23 @@ class WG
       string = jms_connection.receive.body
       @logger.info("Processing word #{string}")
      
-      if string.length < @max_length
+      if string.length >= @max_length
+        @logger.debug("'#{string}' has riched the max length (#{@max_length})")
+      else
         for char in @characters
-            newstring = char.to_s + string
-            # here i should put some checks (max occur could be done here)
-            # send the new string to JMS candidate 
-            jms_connection.send(@jms_candidate_words_queue, newstring)
-            jms_connection.send(@jms_results_queue, newstring) if valid_word?( newstring)
+          @logger.debug("Adding '#{char}' to word '#{string}'")
+          newstring = char.to_s + string
+          
+          # here i should put some checks (max occur could be done here)
+          if valid_max_char_occurs?(newstring)
+              # send the new string to JMS candidate             
+              jms_connection.send(@jms_candidate_words_queue, newstring)
+              jms_connection.send(@jms_results_queue, newstring) if valid_word?( newstring)
+          end
         end # iterate characters
       end
       # the string has been processed
-      jms_connection.send( @jms_processed_words_queue, string) 
+      jms_connection.send( @jms_processed_words_queue, "#{string} by #{hostname}:#{pid}") 
     end # listen to candidate queue
       
     jms_connection.disconnect
@@ -125,8 +181,9 @@ end # class
 exit if __FILE__ != $0
 
 def usage
-  puts "Usage $0 configfile init|dump_results|dump_processed|run"
+  puts "Usage #{$0} configfile init|dump_results|dump_processed|run"
 end
+
 if ARGV.length != 2
   usage
   exit 0
