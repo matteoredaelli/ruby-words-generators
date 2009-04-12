@@ -24,11 +24,15 @@
 
 require 'rubygems'
 require 'stomp'
+require 'logger'
 require 'yaml'
 
 
 class WG
   def initialize( configfile )
+    @logger = Logger.new(STDOUT)
+    @logger.level = Logger::WARN
+
     @CONFIG = YAML::load(File.read(configfile)) 
       
     @characters = @CONFIG['settings']['wg']['characters'].split('')
@@ -56,7 +60,7 @@ class WG
     jms_connection.subscribe(@jms_results_queue)
     
     # receive a string
-    STDERR.puts "DUMP Results:"
+    @logger.info "DUMP Results:"
     while true
       result = jms_connection.receive.body
       STDOUT.puts result.to_s
@@ -71,7 +75,7 @@ class WG
     jms_connection.subscribe(@jms_processed_words_queue)
     
     # receive a string
-    STDERR.puts "DUMP processed words:"
+    @logger.info "DUMP processed:"
     while true
       result = jms_connection.receive.body
       STDOUT.puts result
@@ -97,7 +101,7 @@ class WG
     # receive a string 
     while true
       string = jms_connection.receive.body
-      STDERR.puts "Processing word #{string}"
+      @logger.info("Processing word #{string}")
      
       if string.length < @max_length
         for char in @characters
