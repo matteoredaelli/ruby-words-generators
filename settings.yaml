@@ -1,0 +1,13 @@
+settings:
+  jms:
+    hostname: localhost
+    port: 61613
+    user:
+    password:
+    results_queue: /queue/wg.results
+    candidate_words_queue: /queue/wg.candidate.words
+    processed_words_queue: /queue/wg.processed.words
+  wg:
+    characters: "01"
+    min_length: 2
+    max_length: 30 
