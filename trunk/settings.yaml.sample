@@ -13,3 +13,4 @@ settings:
     max_length: 3
     max_char_occurs: ab:2
     min_char_occurs: b:1,a:1
+    max_run_iterations: 10
