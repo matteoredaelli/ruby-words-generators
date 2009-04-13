@@ -38,6 +38,7 @@ class WG
     @characters = @CONFIG['settings']['wg']['characters'].split('')
     @min_length = @CONFIG['settings']['wg']['min_length'].to_i
     @max_length = @CONFIG['settings']['wg']['max_length'].to_i
+    @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
     
     @min_char_occurs = Hash.new
     for s in @CONFIG['settings']['wg']['min_char_occurs'].split(',')
@@ -141,6 +142,7 @@ class WG
   end
   
   def run
+    runs = @max_run_iterations
     jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
     hostname = Socket.gethostname
     pid = Process.pid
@@ -149,7 +151,8 @@ class WG
     jms_connection.subscribe( @jms_candidate_words_queue )
     
     # receive a string 
-    while true
+    while runs > 0
+      runs = runs -1
       string = jms_connection.receive.body
       @logger.info("Processing word #{string}")
      
@@ -171,9 +174,10 @@ class WG
       # the string has been processed
       jms_connection.send( @jms_processed_words_queue, "#{string} by #{hostname}:#{pid}") 
     end # listen to candidate queue
-      
+    @logger.warn("RUN finished. Done '#{@max_run_iterations}' iterations")  
     jms_connection.disconnect
-  end
+  end # def run
+  
 
 end # class
 
