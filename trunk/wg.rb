@@ -48,7 +48,6 @@ class WG
         @min_char_occurs[char] = value
       end
     end
-    
     @logger.debug("min_char_occurs: #{@min_char_occurs}")
     
     @max_char_occurs = Hash.new
@@ -59,8 +58,24 @@ class WG
         @max_char_occurs[char] = value
       end
     end
-    
     @logger.debug("max_char_occurs: #{@max_char_occurs}")
+    
+    
+    @min_char_list_occurs = Hash.new
+    for s in @CONFIG['settings']['wg']['min_char_list_occurs'].split(',')
+      entry = s.split(':')
+      value = entry[1].to_i
+      @min_char_list_occurs[entry[0]] = value
+    end
+    @logger.debug("min_char_list_occurs: #{@min_char_list_occurs}")
+    
+    @max_char_list_occurs = Hash.new
+    for s in @CONFIG['settings']['wg']['max_char_list_occurs'].split(',')
+      entry = s.split(':')
+      value = entry[1].to_i
+      @max_char_list_occurs[entry[0]] = value
+    end
+    @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
     
     # JMS settings
     @jms_hostname = @CONFIG['settings']['jms']['hostname']
@@ -117,8 +132,8 @@ class WG
     return true
   end
  
-  def valid_min_char_occurs?(string)
-    @min_char_occurs.each do |key, value| 
+  def valid_min_char_occurs?(string, hash)
+    hash.each do |key, value| 
       if string.count(key) < value
         @logger.debug("'#{string}' has too few occurrences (#{value}) of '#{key}'")
         return false        
@@ -127,8 +142,8 @@ class WG
     return true
   end
   
-  def valid_max_char_occurs?(string)
-    @max_char_occurs.each do |key, value| 
+  def valid_max_char_occurs?(string, hash)
+    hash.each do |key, value| 
       if string.count(key) > value
         @logger.debug("'#{string}' has too much occurrences (#{value}) of '#{key}'")
         return false        
@@ -138,7 +153,7 @@ class WG
   end
   
   def valid_word?( string)
-    valid_min_length?(string) and valid_min_char_occurs?(string)
+    valid_min_length?(string) and valid_min_char_occurs?(string, @min_char_occurs) and valid_min_char_occurs?(string, @min_char_list_occurs)
   end
   
   def run
@@ -164,11 +179,15 @@ class WG
           newstring = char.to_s + string
           
           # here i should put some checks (max occur could be done here)
-          if valid_max_char_occurs?(newstring)
+          if not valid_max_char_occurs?(newstring, @max_char_occurs)
+            @logger.debug("'#{newstring}' has riched max_char_occurs")
+          elsif not valid_max_char_occurs?(newstring, @max_char_list_occurs)
+            @logger.debug("'#{newstring}' has riched max_char_list_occurs")
+          else
               # send the new string to JMS candidate             
               jms_connection.send(@jms_candidate_words_queue, newstring)
               jms_connection.send(@jms_results_queue, newstring) if valid_word?( newstring)
-          end
+          end 
         end # iterate characters
       end
       # the string has been processed
