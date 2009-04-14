@@ -8,9 +8,11 @@ settings:
     candidate_words_queue: /queue/wg.candidate.words
     processed_words_queue: /queue/wg.processed.words
   wg:
-    characters: "ab"
+    characters: "abc123ABC"
     min_length: 2
     max_length: 3
     max_char_occurs: ab:2
     min_char_occurs: b:1,a:1
+    min_char_list_occurs: 1234567890:1,ABCDEFG:1
+    max_char_list_occurs: ab:5
     max_run_iterations: 10
