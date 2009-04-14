@@ -185,6 +185,7 @@ end # class
 exit if __FILE__ != $0
 
 def usage
+  puts ""
   puts "Usage #{$0} configfile init|dump_results|dump_processed|run"
 end
 
@@ -195,6 +196,12 @@ end
 
 configfile = ARGV[0]
 action = ARGV[1]
+
+if not FileTest.readable?( configfile )
+  STDERR.puts "The file '#{configfile}' doesn't exists or is not readlable"
+  usage
+  exit 4
+end
 
 wg = WG.new( configfile )
 
