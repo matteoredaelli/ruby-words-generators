@@ -1,0 +1,9 @@
+See http://code.google.com/p/ruby-words-generators/source/browse/trunk/settings.yaml.sample for le list of supported options
+
+Other features are:
+ * parallel/distribuited/concurrent word generators
+ * incremental generation ("restart" not from teh beginning): the words generator can be splited in more than one task (you can set max_run_iterations for each "run")
+
+
+
+
