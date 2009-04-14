@@ -3,4 +3,4 @@
 = Requirements =
  * ruby
  * ruby additional libs: stomp (with rubygems installed, just do 'gems install stomp'
- * a JMS broker like http:://activemq.apache.org or fuse message broker: in this case you need also Java jdk 1.5. Please check that Stomp support is enabled in conf/activemq.xml (http://activemq.apache.org/stomp.html)
+ * a JMS broker like http:://activemq.apache.org or fuse message broker (http://fusesource.com/downloads/): in this case you need also Java jdk 1.5. Please check that Stomp support is enabled in conf/activemq.xml (http://activemq.apache.org/stomp.html)
