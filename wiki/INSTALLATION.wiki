@@ -1,0 +1,3 @@
+Download teh 2 files from http://ruby-words-generators.googlecode.com/svn/trunk/
+
+and then see [USAGE]
