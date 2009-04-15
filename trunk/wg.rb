@@ -39,6 +39,7 @@ class WG
     @min_length = @CONFIG['settings']['wg']['min_length'].to_i
     @max_length = @CONFIG['settings']['wg']['max_length'].to_i
     @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
+    @max_consecutive_chars = @CONFIG['settings']['wg']['max_consecutive_chars'].to_i
     
     @prefix_string = @CONFIG['settings']['wg']['prefix_string'] || ''
     @postfix_string = @CONFIG['settings']['wg']['postfix_string'] || ''
@@ -135,6 +136,18 @@ class WG
     return true
   end
  
+  def valid_max_consecutive_chars?(string)
+    chars = string.split('').uniq
+    chars.each do |char|
+      consecutive_chars = char * (@max_consecutive_chars + 1)
+      if string.include?(consecutive_chars)
+        @logger.debug("'#{string}' has too many consecutive chars ('#{consecutive_chars}').")
+        return false
+      end
+    end
+    return true
+  end
+  
   def valid_min_char_occurs?(string, hash)
     hash.each do |key, value| 
       if string.count(key) < value
@@ -184,6 +197,8 @@ class WG
           # here i should put some checks (max occur could be done here)
           if not valid_max_char_occurs?(newstring, @max_char_occurs)
             @logger.debug("'#{newstring}' has riched max_char_occurs")
+          elsif not valid_max_consecutive_chars?(newstring)
+            @logger.debug("'#{newstring}' has riched max_consecutive_chars")
           elsif not valid_max_char_occurs?(newstring, @max_char_list_occurs)
             @logger.debug("'#{newstring}' has riched max_char_list_occurs")
           else
