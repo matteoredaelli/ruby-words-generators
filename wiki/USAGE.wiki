@@ -38,6 +38,10 @@ mean that the words must have <= 2 of "a" and "b", and >= 1 of "a" and "b"
 
 mean that the words must have at least 1 digit and an uppercase letter from A to G, and then at most 2 letters from A to F
 
+ max-consective_chars: 3
+
+means that the words cannot have more than 3 identical consecutive chars
+
  max_run_iterations: 10
 
 means that the "run" action will stop after 10 iterations. then you can run it again. it is useful if you want to do some processing, stop them and then go on later (maybe the day after)
