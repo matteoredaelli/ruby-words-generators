@@ -40,6 +40,9 @@ class WG
     @max_length = @CONFIG['settings']['wg']['max_length'].to_i
     @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
     
+    @prefix_string = @CONFIG['settings']['wg']['prefix_string'] || ''
+    @postfix_string = @CONFIG['settings']['wg']['postfix_string'] || ''
+    
     @min_char_occurs = Hash.new
     for s in @CONFIG['settings']['wg']['min_char_occurs'].split(',')
       entry = s.split(':')
@@ -186,7 +189,7 @@ class WG
           else
               # send the new string to JMS candidate             
               jms_connection.send(@jms_candidate_words_queue, newstring)
-              jms_connection.send(@jms_results_queue, newstring) if valid_word?( newstring)
+              jms_connection.send(@jms_results_queue, @prefix_string + newstring + @postfix_string) if valid_word?( newstring)
           end 
         end # iterate characters
       end
