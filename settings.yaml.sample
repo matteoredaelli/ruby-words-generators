@@ -18,3 +18,4 @@ settings:
     max_run_iterations: 10
     prefix_string:
     postfix_string:
+    max_consecutive_chars: 2
