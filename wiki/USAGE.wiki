@@ -19,6 +19,7 @@ If you use activemq/fuse message broker, you can monitor JMS activity from Jcons
 
 See the configuration file settings.yaml 
 
+==characters==
  characters: "ab"
 
 means that the words must be build with characters "a" and "b"
