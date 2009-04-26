@@ -192,8 +192,7 @@ class WG
       else
         for char in @characters
           @logger.debug("Adding '#{char}' to word '#{string}'")
-          newstring = char.to_s + string
-          
+          newstring = string + char.to_s
           # here i should put some checks (max occur could be done here)
           if not valid_max_char_occurs?(newstring, @max_char_occurs)
             @logger.debug("'#{newstring}' has riched max_char_occurs")
