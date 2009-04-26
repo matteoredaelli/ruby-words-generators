@@ -44,6 +44,9 @@ class WG
     @prefix_string = @CONFIG['settings']['wg']['prefix_string'] || ''
     @postfix_string = @CONFIG['settings']['wg']['postfix_string'] || ''
     
+    @include_regex = Regexp.new( @CONFIG['settings']['wg']['include_regex'] || '' )
+    @exclude_regex = Regexp.new( @CONFIG['settings']['wg']['exclude_regex'] || '' )
+    
     @min_char_occurs = Hash.new
     for s in @CONFIG['settings']['wg']['min_char_occurs'].split(',')
       entry = s.split(':')
@@ -168,8 +171,20 @@ class WG
     return true
   end
   
+  def valid_regex?(string)
+    if string =~ @include_regex and not string =~ @exclude_regex
+      return true
+    else
+      @logger.debug("'#{string}' does not satify include and/or exclude regexps")
+      return false    
+    end
+  end
+  
   def valid_word?( string)
-    valid_min_length?(string) and valid_min_char_occurs?(string, @min_char_occurs) and valid_min_char_occurs?(string, @min_char_list_occurs)
+    valid_regex?(string) and 
+      valid_min_length?(string) and 
+      valid_min_char_occurs?(string, @min_char_occurs) and 
+      valid_min_char_occurs?(string, @min_char_list_occurs)
   end
   
   def run
