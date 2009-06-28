@@ -6,7 +6,11 @@
 
 Tested with releaeses Release >= 1.8
 
-Ruby additional libs: stomp (with rubygems installed, just do 'gems install stomp'
+Ruby additional libs: stomp 
+
+To install ruby libraries I suggest using rubygems (http://rubygems.org/): to install "stomp" you simply need to run
+
+ gem install stomp
 
 
 ==JMS (stomp) broker==
