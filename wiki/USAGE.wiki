@@ -7,7 +7,7 @@ Create/change a configuration file settings.yaml
 In a console run
 
  * ruby wg.rb settings.yaml init
- * ruby wg.rb settings.yaml dump_results
+ * ruby wg.rb settings.yaml dump_results > wordlist.txt
 
 And in other 1 or more consoles (and maybe on different computers) run
 
