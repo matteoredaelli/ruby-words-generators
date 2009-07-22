@@ -1,16 +1,34 @@
 = Usage =
 
-Start the JMS server, for instance /opt/apacge-activemq/bin/activemq
- 
+== Start a JMS server ==
+
+For instance, if you use apache activemq and it is installed in /opt/apache-activemq, run
+
+ /opt/apache-activemq/bin/activemq &
+
+== Setup Wordlist options ==
+
 Create/change a configuration file settings.yaml 
 
-In a console run
+== Initialize the generator ==
 
- * ruby wg.rb settings.yaml init
- * ruby wg.rb settings.yaml dump_results > wordlist.txt
+The first candidate word is an empty string. To put it in the specific queue run
 
-And in other 1 or more consoles (and maybe on different computers) run
+ ruby wg.rb settings.yaml init
 
- * ruby wg.rb settings.yaml run
+== Dump the results ==
+
+To dump the results to a file "wordlist.txt", you need to run
+ ruby wg.rb settings.yaml dump_results >> wordlist.txt
+
+Press Control+c to stop when it finishes or you want to break it
+ 
+== Run the generators ==
+
+In other 1 or more consoles (and maybe on different computers) you can run one or more genrators
+
+ ruby wg.rb settings.yaml run
+
+== Monitoring the Systems ==
 
 If you use activemq/fuse message broker, you can monitor JMS activity from Jconsole or from the web console (http://localhost:8161/admin/queues.jsp)
