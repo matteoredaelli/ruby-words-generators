@@ -1,5 +1,12 @@
 See http://code.google.com/p/ruby-words-generators/source/browse/trunk/settings.yaml.sample for a sample file 
 
+==splitter_options==
+==splitter_key_value==
+
+Separators inside config .yaml file
+    splitter_options: ","
+    splitter_key_value: ":"
+
 ==characters==
 {{{
  characters: "ab"
