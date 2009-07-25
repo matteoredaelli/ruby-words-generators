@@ -35,30 +35,37 @@ class WG
 
     @CONFIG = YAML::load(File.read(configfile))
 
+    ####################################################################################
+    # wg settings
+    ####################################################################################
     @splitter_options = @CONFIG['settings']['wg']['splitter_options']
     @splitter_key_value = @CONFIG['settings']['wg']['splitter_key_value']
     @logger.debug("splitter_options: #{@splitter_options}")
     @logger.debug("splitter_key_value: #{@splitter_key_value}")
 
-    @characters = @CONFIG['settings']['wg']['characters'].split('')
+    ####################################################################################
+    # wordlist settings
+    ####################################################################################
+
+    @characters = @CONFIG['settings']['wordlist']['characters'].split('')
     @logger.debug("characters: #{@characters}")
 
-    @min_length = @CONFIG['settings']['wg']['min_length'].to_i
-    @max_length = @CONFIG['settings']['wg']['max_length'].to_i
-    @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
-    @max_consecutive_chars = @CONFIG['settings']['wg']['max_consecutive_chars'].to_i
+    @min_length = @CONFIG['settings']['wordlist']['min_length'].to_i
+    @max_length = @CONFIG['settings']['wordlist']['max_length'].to_i
+    @max_run_iterations = @CONFIG['settings']['wordlist']['max_run_iterations'].to_i
+    @max_consecutive_chars = @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
     @logger.debug("max_run_iterations: #{@max_run_iterations}")
-    @prefix_string = @CONFIG['settings']['wg']['prefix_string'] || ''
-    @postfix_string = @CONFIG['settings']['wg']['postfix_string'] || ''
+    @prefix_string = @CONFIG['settings']['wordlist']['prefix_string'] || ''
+    @postfix_string = @CONFIG['settings']['wordlist']['postfix_string'] || ''
     
-    @include_regex = Regexp.new( @CONFIG['settings']['wg']['include_regex'] || '' )
-    @exclude_regex = Regexp.new( @CONFIG['settings']['wg']['exclude_regex'] || '^$' )
+    @include_regex = Regexp.new( @CONFIG['settings']['wordlist']['include_regex'] || '' )
+    @exclude_regex = Regexp.new( @CONFIG['settings']['wordlist']['exclude_regex'] || '^$' )
     
     @logger.debug("include_regex: #{@include_regex}")
     @logger.debug("exclude_regex: #{@exclude_regex}")
 
     @min_char_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['min_char_occurs'].split(@splitter_options)
+    for s in @CONFIG['settings']['wordlist']['min_char_occurs'].split(@splitter_options)
       entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       for char in entry[0].split('')
@@ -68,7 +75,7 @@ class WG
     @logger.debug("min_char_occurs: #{@min_char_occurs}")
     
     @max_char_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['max_char_occurs'].split(@splitter_options)
+    for s in @CONFIG['settings']['wordlist']['max_char_occurs'].split(@splitter_options)
       entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       for char in entry[0].split('')
@@ -79,7 +86,7 @@ class WG
     
     
     @min_char_list_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['min_char_list_occurs'].split(@splitter_options)
+    for s in @CONFIG['settings']['wordlist']['min_char_list_occurs'].split(@splitter_options)
       entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       @min_char_list_occurs[entry[0]] = value
@@ -87,14 +94,16 @@ class WG
     @logger.debug("min_char_list_occurs: #{@min_char_list_occurs}")
     
     @max_char_list_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['max_char_list_occurs'].split(@splitter_options)
+    for s in @CONFIG['settings']['wordlist']['max_char_list_occurs'].split(@splitter_options)
       entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       @max_char_list_occurs[entry[0]] = value
     end
     @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
     
+    ####################################################################################
     # JMS settings
+    ####################################################################################
     jms_hostname = @CONFIG['settings']['jms']['hostname']
     jms_port = @CONFIG['settings']['jms']['port']
     jms_user = @CONFIG['settings']['jms']['user']
