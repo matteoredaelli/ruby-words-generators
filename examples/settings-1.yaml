@@ -8,15 +8,15 @@ settings:
     candidate_words_queue: /queue/wg.candidate.words
     processed_words_queue: /queue/wg.processed.words
   wg:
-    splitter_options: ","
-    splitter_key_value: ":"
-    characters: "abc123ABC"
+    splitter_options: ",,"
+    splitter_key_value: "_"
+    characters: "abcd"
     min_length: 2
     max_length: 4
-    max_char_occurs: ab:5
-    min_char_occurs: "b:1,a:1"
-    min_char_list_occurs: "123:1,ABC:1"
-    max_char_list_occurs: "ab:5"
+    max_char_occurs: "ab_5"
+    min_char_occurs: "b_1,,a_1"
+    min_char_list_occurs: "ab_1,,c_0"
+    max_char_list_occurs: "ab_5"
     max_run_iterations: 10000
     prefix_string:
     postfix_string:

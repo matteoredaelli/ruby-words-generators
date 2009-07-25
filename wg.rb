@@ -33,23 +33,33 @@ class WG
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::DEBUG
 
-    @CONFIG = YAML::load(File.read(configfile)) 
-      
+    @CONFIG = YAML::load(File.read(configfile))
+
+    @splitter_options = @CONFIG['settings']['wg']['splitter_options']
+    @splitter_key_value = @CONFIG['settings']['wg']['splitter_key_value']
+    @logger.debug("splitter_options: #{@splitter_options}")
+    @logger.debug("splitter_key_value: #{@splitter_key_value}")
+
     @characters = @CONFIG['settings']['wg']['characters'].split('')
+    @logger.debug("characters: #{@characters}")
+
     @min_length = @CONFIG['settings']['wg']['min_length'].to_i
     @max_length = @CONFIG['settings']['wg']['max_length'].to_i
     @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
     @max_consecutive_chars = @CONFIG['settings']['wg']['max_consecutive_chars'].to_i
-    
+    @logger.debug("max_run_iterations: #{@max_run_iterations}")
     @prefix_string = @CONFIG['settings']['wg']['prefix_string'] || ''
     @postfix_string = @CONFIG['settings']['wg']['postfix_string'] || ''
     
     @include_regex = Regexp.new( @CONFIG['settings']['wg']['include_regex'] || '' )
-    @exclude_regex = Regexp.new( @CONFIG['settings']['wg']['exclude_regex'] || '' )
+    @exclude_regex = Regexp.new( @CONFIG['settings']['wg']['exclude_regex'] || '^$' )
     
+    @logger.debug("include_regex: #{@include_regex}")
+    @logger.debug("exclude_regex: #{@exclude_regex}")
+
     @min_char_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['min_char_occurs'].split(',')
-      entry = s.split(':')
+    for s in @CONFIG['settings']['wg']['min_char_occurs'].split(@splitter_options)
+      entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       for char in entry[0].split('')
         @min_char_occurs[char] = value
@@ -58,8 +68,8 @@ class WG
     @logger.debug("min_char_occurs: #{@min_char_occurs}")
     
     @max_char_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['max_char_occurs'].split(',')
-      entry = s.split(':')
+    for s in @CONFIG['settings']['wg']['max_char_occurs'].split(@splitter_options)
+      entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       for char in entry[0].split('')
         @max_char_occurs[char] = value
@@ -69,25 +79,35 @@ class WG
     
     
     @min_char_list_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['min_char_list_occurs'].split(',')
-      entry = s.split(':')
+    for s in @CONFIG['settings']['wg']['min_char_list_occurs'].split(@splitter_options)
+      entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       @min_char_list_occurs[entry[0]] = value
     end
     @logger.debug("min_char_list_occurs: #{@min_char_list_occurs}")
     
     @max_char_list_occurs = Hash.new
-    for s in @CONFIG['settings']['wg']['max_char_list_occurs'].split(',')
-      entry = s.split(':')
+    for s in @CONFIG['settings']['wg']['max_char_list_occurs'].split(@splitter_options)
+      entry = s.split(@splitter_key_value)
       value = entry[1].to_i
       @max_char_list_occurs[entry[0]] = value
     end
     @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
     
     # JMS settings
-    @jms_hostname = @CONFIG['settings']['jms']['hostname']
-    @jms_port = @CONFIG['settings']['jms']['port']
-    
+    jms_hostname = @CONFIG['settings']['jms']['hostname']
+    jms_port = @CONFIG['settings']['jms']['port']
+    jms_user = @CONFIG['settings']['jms']['user']
+    jms_password = @CONFIG['settings']['jms']['password']
+
+    @logger.info("Logging to JMS broker #{jms_hostname}:#{jms_port}")
+    @jms_connection =  Stomp::Connection.open(jms_user, jms_password, jms_hostname, jms_port, false)
+    if not @jms_connection
+      @logger.info("Cannot connect to JMS broker")
+      exit(2)
+    else
+      @logger.info("..logged! #{@jms_connection}")
+    end
     @jms_candidate_words_queue = @CONFIG['settings']['jms']['candidate_words_queue']
     @jms_processed_words_queue = @CONFIG['settings']['jms']['processed_words_queue']
     @jms_results_queue = @CONFIG['settings']['jms']['results_queue']  
@@ -95,38 +115,33 @@ class WG
   end
   
   def init
-    jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
-    jms_connection.send(@jms_candidate_words_queue, '')
-    jms_connection.disconnect
+    @logger.info("Adding empty string as candidate")
+    @jms_connection.send(@jms_candidate_words_queue, '')
+
   end
   
   def dump_results
-    jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
-    jms_connection.subscribe(@jms_results_queue)
+    @jms_connection.subscribe(@jms_results_queue)
     
     # receive a string
     @logger.info("DUMP Results:")
     while true
-      result = jms_connection.receive.body
+      result = @jms_connection.receive.body
       STDOUT.puts result.to_s
     end
-    
-    jms_connection.disconnect
     
   end
 
   def dump_processed
-    jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
-    jms_connection.subscribe(@jms_processed_words_queue)
+    @jms_connection.subscribe(@jms_processed_words_queue)
     
     # receive a string
     @logger.info("DUMP processed:")
     while true
-      result = jms_connection.receive.body
+      result = @jms_connection.receive.body
       STDOUT.puts result
     end
-    
-    jms_connection.disconnect
+
     
   end
   
@@ -181,25 +196,26 @@ class WG
   end
   
   def valid_word?( string)
-    valid_regex?(string) and 
+#    valid_regex?(string) and 
       valid_min_length?(string) and 
       valid_min_char_occurs?(string, @min_char_occurs) and 
       valid_min_char_occurs?(string, @min_char_list_occurs)
   end
   
   def run
-    runs = @max_run_iterations
-    jms_connection = Stomp::Connection.open(@jms_user, @jms_password, @jms_hostname, @jms_port, false)
+    runs = 0
     hostname = Socket.gethostname
     pid = Process.pid
 
     # gest strings of size length-1 from JMS
-    jms_connection.subscribe( @jms_candidate_words_queue )
+    @jms_connection.subscribe( @jms_candidate_words_queue )
     
     # receive a string 
-    while runs > 0
-      runs = runs -1
-      string = jms_connection.receive.body
+    while runs <=  @max_run_iterations
+      runs = runs + 1
+      @logger.debug("Iteratation: #{runs} of #{@max_run_iterations}")
+
+      string = @jms_connection.receive.body
       @logger.info("Processing word #{string}")
      
       if string.length >= @max_length
@@ -216,17 +232,21 @@ class WG
           elsif not valid_max_char_occurs?(newstring, @max_char_list_occurs)
             @logger.debug("'#{newstring}' has riched max_char_list_occurs")
           else
-              # send the new string to JMS candidate             
-              jms_connection.send(@jms_candidate_words_queue, newstring)
-              jms_connection.send(@jms_results_queue, @prefix_string + newstring + @postfix_string) if valid_word?( newstring)
+            # send the new string to JMS candidate
+            @logger.warn("******* Adding candidate: #{newstring}")
+            @jms_connection.send(@jms_candidate_words_queue, newstring)
+            if valid_word?( newstring)
+              good_word = @prefix_string + newstring + @postfix_string
+              @logger.warn(">>>>>>>>>>  Adding word: #{good_word}")
+              @jms_connection.send(@jms_results_queue, good_word) 
+            end
           end 
         end # iterate characters
       end
       # the string has been processed
-      jms_connection.send( @jms_processed_words_queue, "#{string} by #{hostname}:#{pid}") 
+      @jms_connection.send( @jms_processed_words_queue, "#{string} by #{hostname}:#{pid}") 
     end # listen to candidate queue
     @logger.warn("RUN finished. Done '#{@max_run_iterations}' iterations")  
-    jms_connection.disconnect
   end # def run
   
 
