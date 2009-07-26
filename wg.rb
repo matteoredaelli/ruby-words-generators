@@ -44,6 +44,7 @@ class WG
     @splitter_options =      @CONFIG['settings']['wg']['splitter_options']
     @splitter_key_value =    @CONFIG['settings']['wg']['splitter_key_value']
     @dump_results_file =      @CONFIG['settings']['wg']['dump_results_file'] + ".#{@hostname}.#{@pid}"
+    @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
     @logger.warn("splitter_options: #{@splitter_options}")
     @logger.warn("splitter_key_value: #{@splitter_key_value}")
 
@@ -56,7 +57,7 @@ class WG
 
     @min_length = @CONFIG['settings']['wordlist']['min_length'].to_i
     @max_length = @CONFIG['settings']['wordlist']['max_length'].to_i
-    @max_run_iterations = @CONFIG['settings']['wordlist']['max_run_iterations'].to_i
+
     @max_consecutive_chars = @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
     @logger.debug("max_run_iterations: #{@max_run_iterations}")
     @prefix_string = @CONFIG['settings']['wordlist']['prefix_string'] || ''

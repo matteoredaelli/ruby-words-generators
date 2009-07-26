@@ -15,6 +15,7 @@ settings:
     splitter_options: ","
     splitter_key_value: ":"
     dump_results_file: results.txt
+    max_run_iterations: 10000
   wordlist:
     characters: "abc123ABC"
     min_length: 2
@@ -23,7 +24,6 @@ settings:
     min_char_occurs: "b:1,a:1"
     min_char_list_occurs: "123:1,ABC:1"
     max_char_list_occurs: "ab:5"
-    max_run_iterations: 10000
     prefix_string:
     postfix_string:
     max_consecutive_chars: 2
