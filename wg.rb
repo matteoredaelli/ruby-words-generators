@@ -43,7 +43,7 @@ class WG
     ####################################################################################
     @splitter_options =      @CONFIG['settings']['wg']['splitter_options']
     @splitter_key_value =    @CONFIG['settings']['wg']['splitter_key_value']
-    @dump_result_file =      @CONFIG['settings']['wg']['dump_result_file'] + ".#{@hostname}.#{@pid}"
+    @dump_results_file =      @CONFIG['settings']['wg']['dump_results_file'] + ".#{@hostname}.#{@pid}"
     @logger.warn("splitter_options: #{@splitter_options}")
     @logger.warn("splitter_key_value: #{@splitter_key_value}")
 
@@ -134,7 +134,7 @@ class WG
   end
   
   def dump_results
-    @logger.info("Dumping results to file #{@dump_result_file}")
+    @logger.info("Dumping results to file #{@dump_results_file}")
     @jms_connection.subscribe(@jms_results_queue)
     run = 0
     # receive a string
@@ -143,7 +143,7 @@ class WG
       result = @jms_connection.receive.body
       run = run + 1
       @logger.debug("run no. #{run}: string #{result}")
-      File.open(@dump_result_file, 'a') {|f| f.write(result.to_s + "\n") }
+      File.open(@dump_results_file, 'a') {|f| f.write(result.to_s + "\n") }
     end
     
   end

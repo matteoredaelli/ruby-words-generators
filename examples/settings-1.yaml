@@ -10,7 +10,7 @@ settings:
   wg:
     splitter_options: ",,"
     splitter_key_value: "_"
-    dump_result_file: results.txt
+    dump_results_file: results.txt
   wordlist:
     characters: "abcd"
     min_length: 2
