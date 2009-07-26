@@ -35,13 +35,17 @@ class WG
 
     @CONFIG = YAML::load(File.read(configfile))
 
+    @hostname = Socket.gethostname
+    @pid = Process.pid.to_s
+
     ####################################################################################
     # wg settings
     ####################################################################################
-    @splitter_options = @CONFIG['settings']['wg']['splitter_options']
-    @splitter_key_value = @CONFIG['settings']['wg']['splitter_key_value']
-    @logger.debug("splitter_options: #{@splitter_options}")
-    @logger.debug("splitter_key_value: #{@splitter_key_value}")
+    @splitter_options =      @CONFIG['settings']['wg']['splitter_options']
+    @splitter_key_value =    @CONFIG['settings']['wg']['splitter_key_value']
+    @dump_result_file =      @CONFIG['settings']['wg']['dump_result_file'] + ".#{@hostname}.#{@pid}"
+    @logger.warn("splitter_options: #{@splitter_options}")
+    @logger.warn("splitter_key_value: #{@splitter_key_value}")
 
     ####################################################################################
     # wordlist settings
@@ -130,13 +134,16 @@ class WG
   end
   
   def dump_results
+    @logger.info("Dumping results to file #{@dump_result_file}")
     @jms_connection.subscribe(@jms_results_queue)
-    
+    run = 0
     # receive a string
     @logger.info("DUMP Results:")
     while true
       result = @jms_connection.receive.body
-      STDOUT.puts result.to_s
+      run = run + 1
+      @logger.debug("run no. #{run}: string #{result}")
+      File.open(@dump_result_file, 'a') {|f| f.write(result.to_s + "\n") }
     end
     
   end
@@ -213,8 +220,7 @@ class WG
   
   def run
     runs = 0
-    hostname = Socket.gethostname
-    pid = Process.pid
+
 
     # gest strings of size length-1 from JMS
     @jms_connection.subscribe( @jms_candidate_words_queue )
@@ -253,7 +259,7 @@ class WG
         end # iterate characters
       end
       # the string has been processed
-      @jms_connection.send( @jms_processed_words_queue, "#{string} by #{hostname}:#{pid}") 
+      @jms_connection.send( @jms_processed_words_queue, "#{string} by #{@hostname}:#{@pid}") 
     end # listen to candidate queue
     @logger.warn("RUN finished. Done '#{@max_run_iterations}' iterations")  
   end # def run
