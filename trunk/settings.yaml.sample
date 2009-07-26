@@ -14,6 +14,7 @@ settings:
   wg:
     splitter_options: ","
     splitter_key_value: ":"
+    dump_result_file: /tmp/results.txt
   wordlist:
     characters: "abc123ABC"
     min_length: 2
