@@ -10,7 +10,7 @@ settings:
   wg:
     splitter_options: ",,"
     splitter_key_value: "_"
-    dump_results_file: results.txt
+    dump_results_file: /tmp/results.txt
     max_run_iterations: 10000
   wordlist:
     characters: "abcd"

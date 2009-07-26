@@ -27,7 +27,14 @@ require 'stomp'
 require 'logger'
 require 'yaml'
 require "socket"
+   
 
+####################################################################################
+# class WG
+# WG is the core of tuby-wg
+#
+#
+####################################################################################
 class WG
   def initialize( configfile )
     @logger = Logger.new(STDOUT)
@@ -37,14 +44,35 @@ class WG
 
     @hostname = Socket.gethostname
     @pid = Process.pid.to_s
+    
+    ####################################################################################
+    # JMS settings
+    ####################################################################################
+    jms_hostname =         @CONFIG['settings']['jms']['hostname']
+    jms_port =             @CONFIG['settings']['jms']['port']
+    jms_user =             @CONFIG['settings']['jms']['user']
+    jms_password =         @CONFIG['settings']['jms']['password']
+
+    @logger.info("Logging to JMS broker #{jms_hostname}:#{jms_port}")
+    @jms_connection =  Stomp::Connection.open(jms_user, jms_password, jms_hostname, jms_port, false)
+    if not @jms_connection
+      @logger.info("Cannot connect to JMS broker")
+      exit(2)
+    else
+      @logger.info("..logged! #{@jms_connection}")
+    end
+    @jms_candidate_words_queue = @CONFIG['settings']['jms']['candidate_words_queue']
+    @jms_processed_words_queue = @CONFIG['settings']['jms']['processed_words_queue']
+    @jms_results_queue =         @CONFIG['settings']['jms']['results_queue']
 
     ####################################################################################
     # wg settings
     ####################################################################################
     @splitter_options =      @CONFIG['settings']['wg']['splitter_options']
     @splitter_key_value =    @CONFIG['settings']['wg']['splitter_key_value']
-    @dump_results_file =      @CONFIG['settings']['wg']['dump_results_file'] + ".#{@hostname}.#{@pid}"
-    @max_run_iterations = @CONFIG['settings']['wg']['max_run_iterations'].to_i
+    @dump_results_file =     @CONFIG['settings']['wg']['dump_results_file'] + ".#{@hostname}.#{@pid}"
+    @max_run_iterations =    @CONFIG['settings']['wg']['max_run_iterations'].to_i
+    @logger.warn("dump_results_file: #{@dump_results_file}")
     @logger.warn("splitter_options: #{@splitter_options}")
     @logger.warn("splitter_key_value: #{@splitter_key_value}")
 
@@ -52,16 +80,16 @@ class WG
     # wordlist settings
     ####################################################################################
 
-    @characters = @CONFIG['settings']['wordlist']['characters'].split('')
+    @characters =            @CONFIG['settings']['wordlist']['characters'].split('')
     @logger.debug("characters: #{@characters}")
 
-    @min_length = @CONFIG['settings']['wordlist']['min_length'].to_i
-    @max_length = @CONFIG['settings']['wordlist']['max_length'].to_i
+    @min_length =            @CONFIG['settings']['wordlist']['min_length'].to_i
+    @max_length =            @CONFIG['settings']['wordlist']['max_length'].to_i
 
     @max_consecutive_chars = @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
     @logger.debug("max_run_iterations: #{@max_run_iterations}")
-    @prefix_string = @CONFIG['settings']['wordlist']['prefix_string'] || ''
-    @postfix_string = @CONFIG['settings']['wordlist']['postfix_string'] || ''
+    @prefix_string =         @CONFIG['settings']['wordlist']['prefix_string'] || ''
+    @postfix_string =        @CONFIG['settings']['wordlist']['postfix_string'] || ''
     
     @include_regex = Regexp.new( @CONFIG['settings']['wordlist']['include_regex'] || '' )
     @exclude_regex = Regexp.new( @CONFIG['settings']['wordlist']['exclude_regex'] || '^$' )
@@ -105,63 +133,62 @@ class WG
       @max_char_list_occurs[entry[0]] = value
     end
     @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
-    
-    ####################################################################################
-    # JMS settings
-    ####################################################################################
-    jms_hostname = @CONFIG['settings']['jms']['hostname']
-    jms_port = @CONFIG['settings']['jms']['port']
-    jms_user = @CONFIG['settings']['jms']['user']
-    jms_password = @CONFIG['settings']['jms']['password']
-
-    @logger.info("Logging to JMS broker #{jms_hostname}:#{jms_port}")
-    @jms_connection =  Stomp::Connection.open(jms_user, jms_password, jms_hostname, jms_port, false)
-    if not @jms_connection
-      @logger.info("Cannot connect to JMS broker")
-      exit(2)
-    else
-      @logger.info("..logged! #{@jms_connection}")
-    end
-    @jms_candidate_words_queue = @CONFIG['settings']['jms']['candidate_words_queue']
-    @jms_processed_words_queue = @CONFIG['settings']['jms']['processed_words_queue']
-    @jms_results_queue = @CONFIG['settings']['jms']['results_queue']  
+  
 
   end
   
+
+  ####################################################################################
+  # 
+  # ACTION init
+  # 
+  ####################################################################################
   def init
     @logger.info("Adding empty string as candidate")
     @jms_connection.send(@jms_candidate_words_queue, '')
-
   end
-  
+
+  ####################################################################################
+  # 
+  # ACTION dump_results
+  # 
+  ####################################################################################
   def dump_results
     @logger.info("Dumping results to file #{@dump_results_file}")
     @jms_connection.subscribe(@jms_results_queue)
-    run = 0
+    runs = 0
     # receive a string
     @logger.info("DUMP Results:")
-    while true
+    while  runs <  @max_run_iterations
       result = @jms_connection.receive.body
-      run = run + 1
-      @logger.debug("run no. #{run}: string #{result}")
+      runs = runs + 1
+      @logger.debug("dumping result no. #{run}: string #{result}")
       File.open(@dump_results_file, 'a') {|f| f.write(result.to_s + "\n") }
-    end
-    
+    end    
   end
 
+  ####################################################################################
+  # 
+  # ACTION dump_processed
+  # 
+  ####################################################################################
   def dump_processed
     @jms_connection.subscribe(@jms_processed_words_queue)
     
+    runs = 0
     # receive a string
-    @logger.info("DUMP processed:")
-    while true
+    @logger.info("DUMP processed strings")
+    while  runs <  @max_run_iterations
+      runs = runs + 1
+      @logger.debug("pumping processed no. #{run}: string #{result}")
       result = @jms_connection.receive.body
       STDOUT.puts result
-    end
-
-    
+    end    
   end
-  
+
+  ####################################################################################
+  # VALID methods 
+  ####################################################################################  
   def valid_min_length?(string)
     l = string.length
     if l < @min_length
@@ -218,16 +245,20 @@ class WG
       valid_min_char_occurs?(string, @min_char_occurs) and 
       valid_min_char_occurs?(string, @min_char_list_occurs)
   end
+
+  ####################################################################################
+  # 
+  # ACTION run
+  # 
+  ####################################################################################
   
   def run
     runs = 0
-
-
     # gest strings of size length-1 from JMS
     @jms_connection.subscribe( @jms_candidate_words_queue )
     
     # receive a string 
-    while runs <=  @max_run_iterations
+    while runs <  @max_run_iterations
       runs = runs + 1
       @logger.debug("Iteratation: #{runs} of #{@max_run_iterations}")
 
@@ -268,8 +299,12 @@ class WG
 
 end # class
 
+########################################################################################
+# MAIN
+########################################################################################
 
 exit if __FILE__ != $0
+
 
 def usage
   puts ""
@@ -278,7 +313,7 @@ end
 
 if ARGV.length != 2
   usage
-  exit 0
+  exit 1
 end
 
 configfile = ARGV[0]
