@@ -180,7 +180,7 @@ class WG
     @logger.info("DUMP processed strings")
     while  runs <  @max_run_iterations
       runs = runs + 1
-      @logger.debug("pumping processed no. #{run}: string #{result}")
+      @logger.debug("dumping processed no. #{run}: string #{result}")
       result = @jms_connection.receive.body
       STDOUT.puts result
     end    
