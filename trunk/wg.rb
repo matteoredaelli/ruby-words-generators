@@ -251,13 +251,12 @@ class WG
   ####################################################################################
   
   def run
-    runs = 0
     # gest strings of size length-1 from JMS
     @jms_connection.subscribe( @jms_candidate_words_queue )
     
     # receive a string 
-    while runs <  @max_run_iterations
-      runs = runs + 1
+    for runs in 1..@max_run_iterations
+
       @logger.debug("Iteratation: #{runs} of #{@max_run_iterations}")
 
       string = @jms_connection.receive.body
