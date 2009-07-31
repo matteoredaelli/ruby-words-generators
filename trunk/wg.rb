@@ -37,7 +37,7 @@ require "socket"
 ####################################################################################
 class WG
   def initialize( configfile )
-    @logger = Logger.new(STDOUT)
+    @logger = Logger.new(STDERR)
     @logger.level = Logger::DEBUG
 
     @CONFIG = YAML::load(File.read(configfile))
@@ -72,28 +72,25 @@ class WG
     @splitter_key_value =    @CONFIG['settings']['wg']['splitter_key_value']
     @dump_results_file =     @CONFIG['settings']['wg']['dump_results_file'] + ".#{@hostname}.#{@pid}"
     @max_run_iterations =    @CONFIG['settings']['wg']['max_run_iterations'].to_i
+
     @logger.warn("dump_results_file: #{@dump_results_file}")
     @logger.warn("splitter_options: #{@splitter_options}")
     @logger.warn("splitter_key_value: #{@splitter_key_value}")
+    @logger.debug("max_run_iterations: #{@max_run_iterations}")
 
     ####################################################################################
     # wordlist settings
     ####################################################################################
-
-    @characters =            @CONFIG['settings']['wordlist']['characters'].split('')
-    @logger.debug("characters: #{@characters}")
-
-    @min_length =            @CONFIG['settings']['wordlist']['min_length'].to_i
-    @max_length =            @CONFIG['settings']['wordlist']['max_length'].to_i
-
-    @max_consecutive_chars = @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
-    @logger.debug("max_run_iterations: #{@max_run_iterations}")
-    @prefix_string =         @CONFIG['settings']['wordlist']['prefix_string'] || ''
-    @postfix_string =        @CONFIG['settings']['wordlist']['postfix_string'] || ''
-    
+    @characters =                @CONFIG['settings']['wordlist']['characters'].split('')
+    @min_length =                @CONFIG['settings']['wordlist']['min_length'].to_i
+    @max_length =                @CONFIG['settings']['wordlist']['max_length'].to_i
+    @max_consecutive_chars =     @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
+    @prefix_string =             @CONFIG['settings']['wordlist']['prefix_string'] || ''
+    @postfix_string =            @CONFIG['settings']['wordlist']['postfix_string'] || ''
     @include_regex = Regexp.new( @CONFIG['settings']['wordlist']['include_regex'] || '' )
-    @exclude_regex = Regexp.new( @CONFIG['settings']['wordlist']['exclude_regex'] || '^$' )
-    
+    @exclude_regex = Regexp.new( @CONFIG['settings']['wordlist']['exclude_regex'] || '^$')
+
+    @logger.debug("characters: #{@characters}")
     @logger.debug("include_regex: #{@include_regex}")
     @logger.debug("exclude_regex: #{@exclude_regex}")
 
@@ -133,8 +130,6 @@ class WG
       @max_char_list_occurs[entry[0]] = value
     end
     @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
-  
-
   end
   
 
@@ -156,16 +151,18 @@ class WG
   def dump_results
     @logger.info("Dumping results to file #{@dump_results_file}")
     @jms_connection.subscribe(@jms_results_queue)
-    runs = 0
+
     # receive a string
     @logger.info("DUMP Results:")
-    while  runs <  @max_run_iterations
+
+    for runs in 1..@max_run_iterations
       result = @jms_connection.receive.body
-      runs = runs + 1
-      @logger.debug("dumping result no. #{run}: string #{result}")
+      @logger.debug("dumping result no. #{runs}: string #{result}")
       File.open(@dump_results_file, 'a') {|f| f.write(result.to_s + "\n") }
-    end    
+      $stderr.flush
+    end 
   end
+
 
   ####################################################################################
   # 
@@ -173,17 +170,17 @@ class WG
   # 
   ####################################################################################
   def dump_processed
-    @jms_connection.subscribe(@jms_processed_words_queue)
-    
-    runs = 0
+    @jms_connection.subscribe(@jms_processed_words_queue )
     # receive a string
     @logger.info("DUMP processed strings")
-    while  runs <  @max_run_iterations
-      runs = runs + 1
-      @logger.debug("dumping processed no. #{run}: string #{result}")
+
+    for runs in 1..@max_run_iterations
+      @logger.debug("dumping processed no. #{runs}: string #{result}")
       result = @jms_connection.receive.body
-      STDOUT.puts result
-    end    
+      $stdout.puts result
+      $stderr.flush
+    end 
+    @jms_connection.disconnect
   end
 
   ####################################################################################
@@ -206,8 +203,8 @@ class WG
         @logger.debug("'#{string}' has too many consecutive chars ('#{consecutive_chars}').")
         return false
       end
-    end
     return true
+  end
   end
   
   def valid_min_char_occurs?(string, hash)
@@ -240,11 +237,12 @@ class WG
   end
   
   def valid_word?( string)
-#    valid_regex?(string) and 
+    #valid_regex?(string) and 
       valid_min_length?(string) and 
       valid_min_char_occurs?(string, @min_char_occurs) and 
       valid_min_char_occurs?(string, @min_char_list_occurs)
   end
+
 
   ####################################################################################
   # 
@@ -292,16 +290,18 @@ class WG
       end
       # the string has been processed
       @jms_connection.send( @jms_processed_words_queue, "#{string} by #{@hostname}:#{@pid}") 
+      $stdout.flush
+      $stderr.flush
     end # listen to candidate queue
     @logger.warn("RUN finished. Done '#{@max_run_iterations}' iterations")  
   end # def run
-  
 
 end # class
 
 ########################################################################################
 # MAIN
 ########################################################################################
+
 
 exit if __FILE__ != $0
 
