@@ -31,4 +31,4 @@ In other 1 or more consoles (and maybe on different computers) you can run one o
 
 == Monitoring the Systems ==
 
-If you use activemq/fuse message broker, you can monitor JMS activity from Jconsole or from the web console (http://localhost:8161/admin/queues.jsp)
+If you use activemq/fuse message broker, you can monitor JMS activity from jconsole command or from the web console (http://localhost:8161/admin/queues.jsp)
