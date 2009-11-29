@@ -1,26 +1,21 @@
 #summary One-sentence summary of this page.
 
-= Requirements =
-
 ==Ruby==
 
-Tested with releaeses Release >= 1.8
+Install ruby language >= 1.8 from http://www.ruby-lang.org (many linux distribution include it by defaults)
 
-Ruby additional libs: stomp 
+Install rubygems from http://rubyforge.org/frs/?group_id=126: it is a tool that let you install additional ruby libraries in a fast way (gem install XXX)
 
-To install ruby libraries I suggest using rubygems (http://rubygems.org/): to install "stomp" you simply need to run
+Install STOMP library with "gem install stomp"
 
- gem install stomp
-
+==JAVA ==
+You need also Java jdk 1.5 (Java 1.6 should work)
 
 ==JMS (stomp) broker==
 
-a JMS broker like
+Download on of the following  JMS brokers
 * apache activemq (http:://activemq.apache.org)
-* fuse message broker (http://fusesource.com/downloads/)
-
-In these two cases 
-* you need also Java jdk 1.5. 
+* fuse message broker (http://fusesource.com/downloads/) 
 * check that Stomp support is enabled in conf/activemq.xml (http://activemq.apache.org/stomp.html)
 
 for instance
