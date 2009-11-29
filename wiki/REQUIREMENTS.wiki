@@ -13,12 +13,12 @@ You need also Java jdk 1.5 (Java 1.6 should work)
 
 ==JMS (stomp) broker==
 
-Download on of the following  JMS brokers:
-* apache activemq (http:://activemq.apache.org)
-* fuse message broker (http://fusesource.com/downloads/) 
-* check that Stomp support is enabled in conf/activemq.xml (http://activemq.apache.org/stomp.html)
+Download and install a JMS brokers: apache activemq (http:://activemq.apache.org) or fuse message broker (http://fusesource.com/downloads/) 
 
-for instance
+Check/Enable Stomp support in the file conf/activemq.xml (http://activemq.apache.org/stomp.html)
+
+
+For instance
 {{{
  wget http://mirror.nohup.it/apache/activemq/apache-activemq/5.2.0/apache-activemq-5.2.0-bin.zip
  unzip apache-activemq-5.2.0-bin.zip
