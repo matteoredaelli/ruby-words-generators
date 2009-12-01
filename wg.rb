@@ -132,7 +132,15 @@ class WG
     end
     @logger.debug("max_char_list_occurs: #{@max_char_list_occurs}")
   end
-  
+
+  ####################################################################################
+  # 
+  # ACTION check
+  # 
+  ####################################################################################
+  def check
+    @logger.info("Check")
+  end
 
   ####################################################################################
   # 
@@ -323,7 +331,7 @@ exit if __FILE__ != $0
 
 def usage
   puts ""
-  puts "Usage #{$0} configfile init|dump_results|dump_processed|run"
+  puts "Usage #{$0} configfile check|init|dump_results|dump_processed|run"
 end
 
 if ARGV.length != 2
@@ -343,12 +351,14 @@ end
 wg = WG.new( configfile )
 
 case action
-when "init"
-  wg.init
+when "check"
+  wg.check
 when "dump_processed"
   wg.dump_processed
 when "dump_results"
   wg.dump_results
+when "init"
+  wg.init
 when "run"
   wg.run
 else
