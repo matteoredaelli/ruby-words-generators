@@ -23,11 +23,11 @@ settings:
     max_char_occurs: ab:5
 #    max_char_occurs: a:5,b:5
     min_char_occurs: "b:1,a:1"
-    min_char_list_occurs: "123:1,ABC:1"
+    min_char_list_occurs: "123:1,aABC:1"
     max_char_list_occurs: "ab:5"
-    prefix_string:
-    postfix_string:
     max_consecutive_chars: 2
-    include_regex:
-    exclude_regex:
+    regexp_list: |
+      e,a$
+      i,^a
+
     

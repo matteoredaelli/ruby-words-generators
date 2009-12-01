@@ -87,12 +87,13 @@ class WG
     @max_consecutive_chars =     @CONFIG['settings']['wordlist']['max_consecutive_chars'].to_i
     @prefix_string =             @CONFIG['settings']['wordlist']['prefix_string'] || ''
     @postfix_string =            @CONFIG['settings']['wordlist']['postfix_string'] || ''
-    @include_regex = Regexp.new( @CONFIG['settings']['wordlist']['include_regex'] || '' )
-    @exclude_regex = Regexp.new( @CONFIG['settings']['wordlist']['exclude_regex'] || '^$')
+    @regexp_list = @CONFIG['settings']['wordlist']['regexp_list'].split("\n").map do |row|
+      fields = row.split(@splitter_options)
+      [fields[0], Regexp.new(fields[1])]
+    end
 
     @logger.debug("characters: #{@characters}")
-    @logger.debug("include_regex: #{@include_regex}")
-    @logger.debug("exclude_regex: #{@exclude_regex}")
+    @logger.debug("regexp_list: #{@regexp_list}")
 
     @min_char_occurs = Hash.new
     for s in @CONFIG['settings']['wordlist']['min_char_occurs'].split(@splitter_options)
@@ -227,17 +228,32 @@ class WG
     return true
   end
   
-  def valid_regex?(string)
-    if string =~ @include_regex and not string =~ @exclude_regex
-      return true
-    else
-      @logger.debug("'#{string}' does not satify include and/or exclude regexps")
-      return false    
+  def valid_regexp?(string)
+    for regexp_row in @regexp_list
+
+      include_exclude = regexp_row[0]
+      regexp =  regexp_row[1]
+      
+      case include_exclude
+      when "i":
+          if not string =~ regexp
+            @logger.debug("'#{string}' does not satify include regexp")
+            return false
+          end
+      when "e":
+          if string =~ regexp
+            @logger.debug("'#{string}' does not satify include and/or exclude regexps")
+            return false
+          end
+      else
+        @logger.debug("'#{include_exclude}' must be one of 'i' or 'e'")  
+      end
     end
+    return true
   end
   
   def valid_word?( string)
-    #valid_regex?(string) and 
+    valid_regexp?(string) and 
       valid_min_length?(string) and 
       valid_min_char_occurs?(string, @min_char_occurs) and 
       valid_min_char_occurs?(string, @min_char_list_occurs)
