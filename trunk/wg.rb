@@ -275,10 +275,10 @@ class WG
   ####################################################################################
   
   def run
-    # gest strings of size length-1 from JMS
+    # getting candidate strings (<= length-1 from) JMS
     @jms_connection.subscribe( @jms_candidate_words_queue )
     
-    # receive a string 
+    # receive a string for at most 'max_run_iterations' parameter
     for runs in 1..@max_run_iterations
 
       @logger.debug("Iteratation: #{runs} of #{@max_run_iterations}")
@@ -287,8 +287,10 @@ class WG
       @logger.info("Processing word #{string}")
      
       if string.length >= @max_length
-        @logger.debug("'#{string}' has riched the max length (#{@max_length})")
+        @logger.debug("'#{string}' has reached the max length (#{@max_length})")
       else
+        # generating new words candidates appending to the candidate word
+        # each char from 'characters' parameter
         for char in @characters
           @logger.debug("Adding '#{char}' to word '#{string}'")
           newstring = string + char.to_s
@@ -325,9 +327,7 @@ end # class
 # MAIN
 ########################################################################################
 
-
 exit if __FILE__ != $0
-
 
 def usage
   puts ""
