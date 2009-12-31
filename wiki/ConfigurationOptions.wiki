@@ -72,12 +72,12 @@ The "run" action will stop after 10 iterations. then you can run it again. it is
 
 You can add a string at the beginning and/or end of the generated words
 
-==include_regex==
-==exclude_regex==
-
+==regexp_list==
+Regular expressions evauated in the order: useful to exclude/include valid words  
 {{{
-    include_regex: "\\d$"
-    exclude_regex: "^\\d"
+    regexp_list: |	 
+      e,a$
+      i,^a
 }}}
 
-The words must not begin with a number and must finish with a number
+The words must begin with "a" and NOT finish with a "a"
