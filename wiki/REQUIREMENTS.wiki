@@ -23,6 +23,13 @@ Download and install/uncompress a JMS broker like apache activemq (http:://activ
  
 Check/Enable Stomp support in the file conf/activemq.xml (see http://activemq.apache.org/stomp.html)
 
+{{{
+        <transportConnectors>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616"/>
+            <transportConnector name="stomp" uri="stomp://0:0:0:0:61613"/>
+        </transportConnectors>
+}}}
+
 Start ActiveMQ
 
 {{{
