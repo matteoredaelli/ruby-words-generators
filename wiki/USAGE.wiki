@@ -25,7 +25,7 @@ Press Control+c to stop when it finishes or you want to break it
  
 == Run the generators ==
 
-In other 1 or more consoles (and maybe on different computers) you can run one or more generators
+Possibly from different computers, you can run one or more generators
 
  ruby wg.rb settings.yaml run
 
