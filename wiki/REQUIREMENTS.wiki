@@ -29,11 +29,5 @@ Start ActiveMQ
  ./bin/activemq &
 }}}
 
-
-For instance
-{{{
- wget http://mirror.nohup.it/apache/activemq/apache-activemq/5.3.0/apache-activemq-5.3.0-bin.zip
- unzip apache-activemq-5.3.0-bin.zip
- cd apache-activemq-5.3.0
- ./bin/activemq &
-}}}
+You can check if activemq and its admin console are available with
+ http://localhost:8161/admin/
