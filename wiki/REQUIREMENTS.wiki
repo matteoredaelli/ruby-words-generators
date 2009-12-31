@@ -9,7 +9,7 @@ Install rubygems from http://rubyforge.org/frs/?group_id=126: it is a tool that 
 Install STOMP library with "gem install stomp"
 
 ==JAVA ==
-You need also Java jdk 1.5 (Java 1.6 should work)
+You need Java jdk >= 1.5 (Java 1.6 is better)
 
 ==JMS (stomp) broker==
 
@@ -31,3 +31,5 @@ Start ActiveMQ
 
 You can check if activemq and its admin console are available with
  http://localhost:8161/admin/
+
+http://ruby-words-generators.googlecode.com/svn/trunk/doc/activemq-admin.png
