@@ -17,16 +17,19 @@ settings:
     dump_results_file: "/tmp/results.txt"
     max_run_iterations: 10000
   wordlist:
-    characters: "abc123ABC"
-    min_length: 2
-    max_length: 4
-    max_char_occurs: ab:5
-#    max_char_occurs: a:5,b:5
+    characters: "abc123ABC"	# list of valid characters
+    min_length: 2		# min length of words
+    max_length: 4		# max length of words
+# at most 5 occurrences of "a" and "b", the same as max_char_occurs: a:5,b:5
+    max_char_occurs: ab:5	
     min_char_occurs: "b:1,a:1"
-    min_char_list_occurs: "123:1,aABC:1"
+    min_char_list_occurs: "123:1,aABC:1" # at least 1 occurrence of one of "1","2","3","a","A","B","C" 
     max_char_list_occurs: "ab:5"
-    max_consecutive_chars: 2
-    regexp_list: |
+    max_consecutive_chars: 2 # no more then 2 consecutive occurrences of the same character
+# a list of regular expressions that will be evaluated in order 
+# "e" means "exclude"
+# "i" means "include"
+    regexp_list: |	 
       e,a$
       i,^a
 
