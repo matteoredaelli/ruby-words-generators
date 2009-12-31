@@ -31,4 +31,10 @@ In other 1 or more consoles (and maybe on different computers) you can run one o
 
 == Monitoring the Systems ==
 
-If you use activemq/fuse message broker, you can monitor JMS activity from jconsole command http://ruby-words-generators.googlecode.com/svn/trunk/doc/jconsole.png or from the web console (http://localhost:8161/admin/queues.jsp)  http://ruby-words-generators.googlecode.com/svn/trunk/doc/activemq-admin.png
+If you use activemq/fuse message broker, you can monitor JMS activity from jconsole command 
+
+http://ruby-words-generators.googlecode.com/svn/trunk/doc/jconsole.png 
+
+or from the web console (http://localhost:8161/admin/queues.jsp)  
+
+http://ruby-words-generators.googlecode.com/svn/trunk/doc/activemq-admin.png
