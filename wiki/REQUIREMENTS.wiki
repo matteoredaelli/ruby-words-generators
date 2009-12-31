@@ -30,6 +30,6 @@ Start ActiveMQ
 }}}
 
 You can check if activemq and its admin console are available with
- http://localhost:8161/admin/
+ http://localhost:8161/admin/: the queues wg.* will be created when you start word generations..
 
 http://ruby-words-generators.googlecode.com/svn/trunk/doc/activemq-admin.png
