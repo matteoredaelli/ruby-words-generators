@@ -1,4 +1,4 @@
-= Usage =
+* Before going on, please see [REQUIREMENTS] page
 
 == Start a JMS server ==
 
