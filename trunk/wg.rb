@@ -14,13 +14,21 @@
 
 # == Synopsis
 #
-# wg.rb: greets user, demonstrates command line parsing
+# wg.rb: a scalable, opensource and reliable wordlist generator
 #
 # == Usage
 #
 # wg.rb configfile action ...
 #
+# Visit project page at 
+#   http://code.google.com/p/ruby-words-generators
+#   http://raa.ruby-lang.org/project/ruby-wg/
 #
+# == Author ==
+#
+# Matteo Redaelli
+# web site: http://www.redaelli.org/matteo
+# blog: 
 
 require 'rubygems'
 require 'stomp'
@@ -31,7 +39,7 @@ require "socket"
 
 ####################################################################################
 # class WG
-# WG is the core of tuby-wg
+# WG is the core of ruby-wg
 #
 #
 ####################################################################################
@@ -184,8 +192,8 @@ class WG
     @logger.info("DUMP processed strings")
 
     for runs in 1..@max_run_iterations
-      @logger.debug("dumping processed no. #{runs}: string #{result}")
       result = @jms_connection.receive.body
+      @logger.debug("dumping processed no. #{runs}: string #{result}")
       $stdout.puts result
       $stderr.flush
     end 
