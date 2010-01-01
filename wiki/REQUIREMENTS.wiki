@@ -2,9 +2,9 @@
 
 ==Ruby==
 
-Install ruby language >= 1.8 from http://www.ruby-lang.org (many linux distribution include it by defaults)
+Install ruby language >= 1.8 from http://www.ruby-lang.org (many Linux distributions include it by defaults)
 
-Install rubygems from http://rubyforge.org/frs/?group_id=126: it is a tool that let you install additional ruby libraries in a fast way (gem install XXX)
+Install rubygems from http://rubyforge.org/frs/?group_id=126: this tool helps you to install easily additional ruby libraries in a fast way (gem install XXX)
 
 Install STOMP library with "gem install stomp"
 
