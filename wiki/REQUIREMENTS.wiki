@@ -11,6 +11,8 @@ Install STOMP library with "gem install stomp"
 ==JAVA ==
 You need Java jdk >= 1.5 (Java 1.6 is better): you can download it from http://java.sun.com/javase/downloads/index.jsp
 
+Set JAVA_HOME with the path where you installed jdk
+
 ==JMS (stomp) broker==
 
 Download and install/uncompress a JMS broker like apache activemq (http:://activemq.apache.org) or fuse message broker (http://fusesource.com/downloads/)
