@@ -30,7 +30,7 @@
 # Web site: http://www.redaelli.org/matteo
 # Blog: http://www.redaelli.org/matteo/blog/
 
-require 'rubygems'
+#require 'rubygems'
 require 'stomp'
 require 'logger'
 require 'yaml'
@@ -250,12 +250,12 @@ class WG
       regexp =  regexp_row[1]
       
       case include_exclude
-      when "i":
+      when "i"
           if not string =~ regexp
             @logger.debug("'#{string}' does not satify include regexp")
             return false
           end
-      when "e":
+      when "e"
           if string =~ regexp
             @logger.debug("'#{string}' does not satify include and/or exclude regexps")
             return false
@@ -292,7 +292,7 @@ class WG
 
       string = @jms_connection.receive.body
       @logger.info("Processing word #{string}")
-     
+      
       if string.length >= @max_length
         @logger.debug("'#{string}' has reached the max length (#{@max_length})")
       else
