@@ -6,8 +6,8 @@ settings:
   jms:
     hostname: localhost
     port: 61613
-    user:
-    password:
+    user: system
+    password: manager
     results_queue: /queue/wg.results
     candidate_words_queue: /queue/wg.candidate.words
     processed_words_queue: /queue/wg.processed.words
