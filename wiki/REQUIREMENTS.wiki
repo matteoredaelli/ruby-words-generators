@@ -22,6 +22,13 @@ Download and install/uncompress a JMS broker like apache activemq (http:://activ
  tar xvfz apache-activemq-5.4.1-bin.tar.gz
  cd apache-activemq-5.4.1
 }}}
+
+{{{
+ From activemq 5.4.0 & unix (see [[http://activemq.apache.org/unix-shell-script.html unix]], you can simply
+
+  bin/activemq start xbean:conf/activemq-stomp.xml
+
+}}}
  
 Check Stomp support in the file conf/activemq.xml: if you find  
 
