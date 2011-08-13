@@ -6,8 +6,15 @@ settings:
   jms:
     hostname: localhost
     port: 61613
-    user: system
-    password: manager
+############################
+#   Rabbitmq activemq login
+    user: guest
+    password: guest
+############################
+#    Apache activemq login
+#    password: manager
+#    user: system
+############################
     results_queue: /queue/wg.results
     candidate_words_queue: /queue/wg.candidate.words
     processed_words_queue: /queue/wg.processed.words

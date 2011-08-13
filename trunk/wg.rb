@@ -30,7 +30,7 @@
 # Web site: http://www.redaelli.org/matteo
 # Blog: http://www.redaelli.org/matteo/blog/
 
-#require 'rubygems'
+require 'rubygems'
 require 'stomp'
 require 'logger'
 require 'yaml'
@@ -157,7 +157,7 @@ class WG
   ####################################################################################
   def init
     @logger.info("Adding empty string as candidate")
-    @jms_connection.send(@jms_candidate_words_queue, '', :persistent => true)
+    @jms_connection.publish(@jms_candidate_words_queue, '', :persistent => true)
   end
 
   ####################################################################################
@@ -311,17 +311,17 @@ class WG
           else
             # send the new string to JMS candidate
             @logger.warn("******* Adding candidate: #{newstring}")
-            @jms_connection.send(@jms_candidate_words_queue, newstring,:persistent => true )
+            @jms_connection.publish(@jms_candidate_words_queue, newstring,:persistent => true )
             if valid_word?( newstring)
               good_word = @prefix_string + newstring + @postfix_string
               @logger.warn(">>>>>>>>>>  Adding word: #{good_word}")
-              @jms_connection.send(@jms_results_queue, good_word,:persistent => true ) 
+              @jms_connection.publish(@jms_results_queue, good_word,:persistent => true ) 
             end
           end 
         end # iterate characters
       end
       # the string has been processed
-      @jms_connection.send( @jms_processed_words_queue, "#{string} by #{@hostname}:#{@pid}") 
+      @jms_connection.publish( @jms_processed_words_queue, "#{string} by #{@hostname}:#{@pid}") 
       $stdout.flush
       $stderr.flush
     end # listen to candidate queue
