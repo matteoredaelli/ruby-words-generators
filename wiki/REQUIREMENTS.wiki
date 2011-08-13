@@ -8,12 +8,16 @@ Install rubygems from http://rubyforge.org/frs/?group_id=126: this tool helps yo
 
 Install STOMP library with "gem install stomp"
 
-==JAVA ==
+==JMS (stomp) broker==
+
+I have tested Apache Activemq
+
+===JAVA ===
 You need Java jdk >= 1.5 (Java 1.6 is better): you can download it from http://java.sun.com/javase/downloads/index.jsp
 
 Set JAVA_HOME with the path where you installed jdk
 
-==JMS (stomp) broker==
+===Apache Activemq ===
 
 Download and install/uncompress a JMS broker like apache activemq (http:://activemq.apache.org) or fuse message broker (http://fusesource.com/downloads/)
 
