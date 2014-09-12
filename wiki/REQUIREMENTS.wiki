@@ -2,7 +2,7 @@
 
 ==Ruby==
 
-Install ruby language >= 1.8 from http://www.ruby-lang.org (many Linux distributions include it by defaults)
+Install ruby language >= 1.8 (tested also with 2.1) from http://www.ruby-lang.org (many Linux distributions include it by defaults)
 
 Install rubygems from http://rubyforge.org/frs/?group_id=126: this tool helps you to install easily additional ruby libraries in a fast way (gem install XXX)
 
@@ -14,8 +14,14 @@ I have tested RabbitMQ and ApacheActiveMQ. Choose and install one of them!
 
 == RabbitMQ ==
 
-Install RAbbitMQ from http://www.rabbitmq.com/download.html
-Add stomp support following the instructions from http://www.rabbitmq.com/plugins.html#rabbitmq_stomp. It is easyç you have to download two files and copy them in the plugins folder
+Download and Install RabbitMQ from http://www.rabbitmq.com/download.html
+or, if you have Linux Debianorubuntu, you are like and can simply run
+
+{{{
+apt-get install rabbitmq-server
+  
+rabbitmq-plugins enable rabbitmq_stomp
+}}}
 
 ===Apache Activemq ===
 
