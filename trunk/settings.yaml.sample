@@ -6,12 +6,16 @@ settings:
   jms:
     hostname: localhost
     port: 61613
+
 ############################
 #   Rabbitmq activemq login
+############################
     user: guest
     password: guest
+
 ############################
 #    Apache activemq login
+############################
 #    password: manager
 #    user: system
 ############################
@@ -40,4 +44,3 @@ settings:
       e,a$
       i,^a
 
-    
